@@ -6,7 +6,6 @@ from django.contrib.auth.models import AbstractUser
 class Account(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
-    password = models.CharField(max_length=8)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
@@ -16,7 +15,6 @@ class Account(AbstractUser):
     
 
 class Product(models.Model):
-    user = models.ForeignKey(Account, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100)
     image = models.ImageField()

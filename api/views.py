@@ -44,6 +44,7 @@ def total_cart(request):
 
 @api_view(['GET'])
 def getCart(request, username):
+
     user = Account.objects.get(username=username)
     cart = Cart.objects.filter(user=user)
 
@@ -52,9 +53,10 @@ def getCart(request, username):
 
 
 @api_view(['GET'])
-def getCartItem(request, id):
+def getCartItem(request, username, id):
+    user = Account.objects.get(username=username)
     product = Product.objects.get(id=id)
-    cart = Cart.objects.get(product = product)
+    cart = Cart.objects.get(user = user, product = product)
 
     serializer = CartSerializer(cart, many=False)
     return Response(serializer.data)
@@ -64,16 +66,24 @@ def getCartItem(request, id):
 def addToCart(request, username, id):
     user = Account.objects.get(username=username)
     product = Product.objects.get(id=id)
+    print(product.name)
     try:
-        cart = Cart.objects.get(product=product)
+        cart = Cart.objects.get(user=user, product=product)
+        print(cart)
         if cart:
             cart.quantity+=1
             cart.save()
-    except:
-        cart = Cart.objects.create(user=user,
+        else:
+            new_cart = Cart.objects.create(user=user,
                                     product=product,
                                     quantity=1)
-        cart.save()
+            new_cart.save()
+            
+    except:
+        new_cart = Cart.objects.create(user=user,
+                                    product=product,
+                                    quantity=1)
+        new_cart.save()
     
     serializer = ProductSerializer(product, many=False)
     return Response(serializer.data)
@@ -107,14 +117,23 @@ def deleteCartItem(request, id):
 @api_view(['GET', 'POST'])
 def signup(request):
     if request.method == "POST":
-        # username = request.data['username']
-        # email = request.data['email']
-        # password = request.data['password']
+        username = request.data['username']
+        email = request.data['email']
+        password = request.data['password']
 
-        serializer = AccountSerializer(data=request.data)
+        serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        user = None
+        if not user:
+            user = authenticate(username=username, password=password)
+            print(user)
+
+        if user:
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({'username': username,'token': token.key}, status=status.HTTP_200_OK)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response()
 
@@ -123,16 +142,18 @@ def signup(request):
 @api_view(['GET', 'POST'])
 def login(request):
     if request.method == "POST":
-        username = request.data['username']
-        password = request.data['password']
+        username = request.data.get('username')
+        password = request.data.get('password')
+        print(username, password)
 
         user = None
         if not user:
             user = authenticate(username=username, password=password)
+            print(user)
 
         if user:
             token, _ = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            return Response({'username': username,'token': token.key}, status=status.HTTP_200_OK)
         
         return Response({'error': 'Invalid Credintial'}, status=status.HTTP_401_UNAUTHORIZED)
     return Response()
