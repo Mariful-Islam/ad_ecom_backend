@@ -47,38 +47,3 @@ class Cart(models.Model):
     def product_price(self):
         return self.product.price
     
-    # def cart_total_number(self):
-    #     quantity = 0
-    #     for cart in Cart.objects.all():
-    #         quantity += cart.quantity
-        
-    #     return quantity
-
-
-    # def cart_total_price(self):
-    #     price = 0
-    #     for cart in Cart.objects.all():
-    #         price += cart.product.price
-        
-    #     return price
-
-class CartSummary(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-
-
-    def __str__(self) -> str:
-        return self.cart.user.username
-    
-    def cart_total_number(self):
-        quantity = 0
-        for cart in CartSummary.objects.all():
-            quantity += cart.cart.quantity
-        
-        return quantity
-
-    def cart_total_price(self):
-        price = 0
-        for cart in CartSummary.objects.all():
-            price += cart.cart.product.price*cart.cart.quantity
-        
-        return price

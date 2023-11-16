@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api', 
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 ]
 
@@ -73,6 +74,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 AUTH_USER_MODEL = 'api.Account'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    # Other settings...
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

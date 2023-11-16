@@ -18,8 +18,3 @@ class CartModel(admin.ModelAdmin):
     list_display = ('username', 'product')
 
 admin.site.register(Cart, CartModel)
-
-class CartSummaryModel(admin.ModelAdmin):
-    list_display = ('cart_total_number', 'cart_total_price')
-
-admin.site.register(CartSummary, CartSummaryModel)
