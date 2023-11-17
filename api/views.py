@@ -45,11 +45,22 @@ def total_cart(request):
 @api_view(['GET'])
 def getCart(request, username):
 
-    user = Account.objects.get(username=username)
-    cart = Cart.objects.filter(user=user)
+    try:
+        user = Account.objects.get(username=username)
+        if not user:
+            pass
+        else:
+            cart = Cart.objects.filter(user=user)
+            serializer = CartSerializer(cart, many=True)
+            return Response(serializer.data)
 
-    serializer = CartSerializer(cart, many=True)
-    return Response(serializer.data)
+    except:
+        pass
+    
+    return Response()
+
+       
+    
 
 
 @api_view(['GET'])
@@ -164,7 +175,7 @@ def login(request):
 def logout(request):
     if request.method == "POST":
         try:
-            request.user.auth_token.delete()
+            request.user.authtoken_token.delete()
             return Response({'message': 'Successfully Log Out'}, status=status.HTTP_200_OK)
 
         except Exception as e:
